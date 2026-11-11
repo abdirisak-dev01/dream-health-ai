@@ -1,0 +1,46 @@
+# Dream Health AI - local stack (web app at http://localhost:8000)
+#   docker compose up --build          start everything
+#   docker compose run --rm api pytest  run the tests
+name: dream-health-ai
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dhai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dhai}
+      POSTGRES_DB: ${POSTGRES_DB:-dhai}
+    volumes:
+      - dhai_pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    # Only reachable from this computer, not your network
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dhai} -d ${POSTGRES_DB:-dhai}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-dhai}:${POSTGRES_PASSWORD:-dhai}@db:5432/${POSTGRES_DB:-dhai}
+      TEST_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-dhai}:${POSTGRES_PASSWORD:-dhai}@db:5432/dhai_test
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-dev-only-change-me}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-30}
+      SMS_PROVIDER: ${SMS_PROVIDER:-outbox}
+      SMS_APP_NUMBER: ${SMS_APP_NUMBER:-+15550001000}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM: ${TWILIO_FROM:-}
+      REMINDER_TICK_SECONDS: ${REMINDER_TICK_SECONDS:-30}
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  dhai_pgdata:

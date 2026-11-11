@@ -1,0 +1,19 @@
+code,name,label_en,label_so,label_es,aliases,state,kcal,protein_g,carbs_g,fat_g,fiber_g,portions
+dev-chicken-breast-raw,"Chicken breast, skinless, raw",Chicken breast (raw),Naas digaag (cayriin),Pechuga de pollo (cruda),chicken|chicken breast|raw chicken|pollo|pechuga de pollo|pollo crudo|digaag|digaag cayriin|naas digaag,raw,120,22.5,0,2.6,0,
+dev-chicken-breast-cooked,"Chicken breast, skinless, roasted",Chicken breast (roasted),Naas digaag (la dubay),Pechuga de pollo (asada),chicken|chicken breast|roasted chicken|grilled chicken|cooked chicken|pollo|pollo asado|pechuga asada|pollo a la plancha|digaag|digaag la dubay|digaag duban|naas digaag,cooked,165,31.0,0,3.6,0,
+dev-rice-white-cooked,"Rice, white, long-grain, cooked",Rice (cooked),Bariis (la karsaday),Arroz blanco (cocido),rice|white rice|bariis|arroz|arroz blanco,cooked,130,2.7,28.2,0.3,0.4,cup:158
+dev-egg-whole-raw,"Egg, whole, raw",Egg,Ukun,Huevo,egg|eggs|huevo|huevos|ukun|ukumo,raw,143,12.6,0.7,9.5,0,large:50*|medium:44
+dev-banana-raw,"Banana, raw",Banana,Muus,Banana,banana|bananas|muus|platano|banano,raw,89,1.1,22.8,0.3,2.6,medium:118*|small:101|large:136
+dev-apple-raw,"Apple, with skin, raw",Apple,Tufaax,Manzana,apple|apples|tufaax|manzana|manzanas,raw,52,0.3,13.8,0.2,2.4,medium:182*|small:149
+dev-oats-dry,"Oats, rolled, dry",Oats (dry),Boorash (qalalan),Avena (seca),oats|oatmeal|rolled oats|avena|boorash|shuurad,raw,379,13.2,67.7,6.5,10.1,cup:81
+dev-milk-whole,"Milk, whole",Milk (whole),Caano,Leche entera,milk|whole milk|caano|leche|leche entera,n/a,61,3.2,4.8,3.3,0,cup:244
+dev-yogurt-plain-whole,"Yogurt, plain, whole milk",Yogurt (plain),Caano fadhi,Yogur natural,yogurt|yoghurt|plain yogurt|caano fadhi|yogur|yogurt natural,n/a,61,3.5,4.7,3.3,0,cup:245
+dev-black-beans-cooked,"Black beans, boiled",Black beans (cooked),Digir madow (la karsaday),Frijoles negros (cocidos),black beans|beans|digir|digir madow|frijoles|frijoles negros,cooked,132,8.9,23.7,0.5,8.7,cup:172
+dev-lentils-cooked,"Lentils, boiled",Lentils (cooked),Misir (la karsaday),Lentejas (cocidas),lentils|lentil|misir|lentejas,cooked,116,9.0,20.1,0.4,7.9,cup:198
+dev-bread-whole-wheat,"Bread, whole wheat",Whole wheat bread,Rooti sarreen,Pan integral,bread|wheat bread|whole wheat bread|rooti|roodhi|pan|pan integral,prepared,252,12.4,42.7,3.5,6.0,slice:32*
+dev-olive-oil,"Oil, olive",Olive oil,Saliid saytuun,Aceite de oliva,olive oil|oil|saliid|saliid saytuun|aceite|aceite de oliva,n/a,884,0,0,100,0,tbsp:13.5|tsp:4.5
+dev-beef-ground-85-cooked,"Beef, ground, 85% lean, pan-browned",Ground beef (cooked),Hilib lo'aad (shiidan),Carne molida (cocida),beef|ground beef|hilib lo'aad|hilib|carne|carne molida|carne de res,cooked,250,25.9,0,15.4,0,
+dev-salmon-cooked,"Salmon, Atlantic, farmed, cooked",Salmon (cooked),Kalluun salmon (la karsaday),Salmón (cocido),salmon|fish|kalluun|salmon fish|pescado,cooked,206,22.1,0,12.4,0,
+dev-goat-cooked,"Goat, roasted",Goat (roasted),Hilib ari (la dubay),Cabra (asada),goat|goat meat|hilib ari|hilib|cabra|chivo,cooked,143,27.1,0,3.0,0,
+dev-potato-baked,"Potato, baked, flesh and skin",Potato (baked),Baradho (la dubay),Papa (al horno),potato|potatoes|baked potato|baradho|papa|papas|patata,cooked,93,2.5,21.2,0.1,2.2,medium:173*
+dev-spinach-raw,"Spinach, raw",Spinach,Isbinaaj,Espinaca,spinach|isbinaaj|espinaca|espinacas,raw,23,2.9,3.6,0.4,2.2,cup:30

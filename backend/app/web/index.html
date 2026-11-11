@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dream Health</title>
+  <meta name="theme-color" content="#0E4A45">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2716%27 fill=%27%230E4A45%27/%3E%3Cpath d=%27M8 21a8 8 0 0 1 16 0%27 stroke=%27%23E8A317%27 stroke-width=%273.5%27 fill=%27none%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Login / register -->
+  <main id="auth" class="auth" hidden>
+    <div class="auth-card">
+      <div class="lang-pick" role="group" aria-label="Language">
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="so">Soomaali</button>
+        <button type="button" data-lang="es">Español</button>
+      </div>
+      <h1 class="brand">Dream Health</h1>
+      <p class="lede" data-i18n="lede"></p>
+      <div class="seg" role="tablist">
+        <button type="button" role="tab" data-auth="login" aria-selected="true" data-i18n="tab_login"></button>
+        <button type="button" role="tab" data-auth="register" aria-selected="false" data-i18n="tab_register"></button>
+      </div>
+      <form id="auth-form" novalidate>
+        <label class="reg-only"><span data-i18n="f_name"></span> <input id="f-name" name="display_name" autocomplete="name" maxlength="80"></label>
+        <label><span data-i18n="f_email"></span> <input id="f-email" name="email" type="email" autocomplete="email" required></label>
+        <label><span data-i18n="f_password"></span> <input id="f-password" name="password" type="password" autocomplete="current-password" required>
+          <small class="reg-only" data-i18n="pw_hint"></small></label>
+        <p class="form-error" role="alert"></p>
+        <button class="btn primary wide" type="submit" id="auth-submit"></button>
+      </form>
+    </div>
+  </main>
+
+  <!-- App shell -->
+  <div id="shell" class="shell" hidden>
+    <nav class="rail" aria-label="Main">
+      <span class="rail-brand">Dream Health</span>
+      <a href="#today" data-tab="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/></svg><span data-i18n="nav_today"></span></a>
+      <a href="#chat" data-tab="chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span data-i18n="nav_chat"></span></a>
+      <a href="#phone" data-tab="phone"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg><span data-i18n="nav_texts"></span></a>
+      <a href="#reminders" data-tab="reminders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/></svg><span data-i18n="nav_reminders"></span></a>
+      <a href="#settings" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span data-i18n="nav_settings"></span></a>
+      <button class="rail-logout" id="logout" type="button" data-i18n="logout"></button>
+    </nav>
+
+    <main class="content">
+      <!-- TODAY -->
+      <section id="view-today" class="view" hidden>
+        <header class="view-head">
+          <h1 id="today-title"></h1>
+          <div class="day-nav">
+            <button class="icon-btn" id="day-prev" aria-label="Previous day">‹</button>
+            <button class="icon-btn" id="day-next" aria-label="Next day">›</button>
+          </div>
+        </header>
+        <div class="gauge-wrap">
+          <svg class="gauge" viewBox="0 0 220 128" role="img" aria-labelledby="gauge-label">
+            <path class="gauge-track" d="M20 115 A90 90 0 0 1 200 115"/>
+            <path class="gauge-fill" id="gauge-fill" d="M20 115 A90 90 0 0 1 200 115" pathLength="100"/>
+          </svg>
+          <div class="gauge-read" id="gauge-label">
+            <strong id="kcal-left">–</strong>
+            <span id="kcal-caption"></span>
+          </div>
+        </div>
+        <dl class="macros" id="macros"></dl>
+        <p class="note" id="today-note"></p>
+        <div class="row-head"><h2 data-i18n="meals"></h2><a class="btn primary" href="#chat" data-i18n="log_meal"></a></div>
+        <ul class="meal-list" id="meal-list"></ul>
+      </section>
+
+      <!-- CHAT -->
+      <section id="view-chat" class="view chat-view" hidden>
+        <header class="view-head"><h1 data-i18n="chat"></h1></header>
+        <ol class="thread" id="chat-thread" aria-live="polite"></ol>
+        <div class="quick">
+          <button type="button" class="chip" data-say="say_yes" data-i18n="chip_yes"></button>
+          <button type="button" class="chip" data-say="say_no" data-i18n="chip_no"></button>
+          <button type="button" class="chip" data-say="say_today" data-i18n="chip_today"></button>
+          <button type="button" class="chip" data-say="say_help" data-i18n="chip_help"></button>
+        </div>
+        <form class="composer" id="chat-form">
+          <input name="text" id="chat-input" autocomplete="off" maxlength="1000" data-i18n-ph="chat_ph" aria-label="Message">
+          <button class="btn primary" type="submit" data-i18n="send"></button>
+        </form>
+      </section>
+
+      <!-- FAKE PHONE -->
+      <section id="view-phone" class="view" hidden>
+        <header class="view-head"><h1 data-i18n="texts"></h1></header>
+        <p class="test-banner" id="phone-banner" data-i18n="test_banner"></p>
+        <div id="phone-need" class="empty" hidden>
+          <p data-i18n="need_phone"></p>
+          <a class="btn primary" href="#settings" data-i18n="go_settings"></a>
+        </div>
+        <div class="handset" id="handset" hidden>
+          <div class="handset-top"><span id="handset-from">Dream Health</span><small id="handset-num"></small></div>
+          <ol class="sms-thread" id="sms-thread" aria-live="polite"></ol>
+          <form class="sms-compose" id="sms-form">
+            <input id="sms-input" autocomplete="off" maxlength="1000" data-i18n-ph="sms_ph" aria-label="Text message">
+            <button type="submit" aria-label="Send text">↑</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- REMINDERS -->
+      <section id="view-reminders" class="view" hidden>
+        <header class="view-head"><h1 data-i18n="reminders"></h1></header>
+        <p class="note" id="notif-state"></p>
+        <ul class="rem-list" id="rem-list"></ul>
+        <form class="panel" id="rem-form">
+          <h2 data-i18n="add_rem"></h2>
+          <div class="grid2">
+            <label><span data-i18n="r_for"></span> <select id="rem-label" name="label">
+              <option value="breakfast" data-i18n="m_breakfast"></option><option value="lunch" selected data-i18n="m_lunch"></option>
+              <option value="dinner" data-i18n="m_dinner"></option><option value="snack" data-i18n="m_snack"></option>
+              <option value="custom" data-i18n="m_custom"></option></select></label>
+            <label><span data-i18n="r_time"></span> <input id="rem-time" type="time" name="at_time" value="12:30" required></label>
+          </div>
+          <fieldset class="days"><legend data-i18n="r_days"></legend></fieldset>
+          <fieldset class="checks"><legend data-i18n="r_send_to"></legend>
+            <label><input id="rem-ch-app" type="checkbox" name="ch_in_app" checked> <span data-i18n="r_app"></span></label>
+            <label><input id="rem-ch-sms" type="checkbox" name="ch_sms"> <span data-i18n="r_text"></span></label>
+          </fieldset>
+          <label><span data-i18n="r_words"></span> <input id="rem-msg" name="message" maxlength="160" data-i18n-ph="r_words_ph"></label>
+          <label class="inline"><input id="rem-skip" type="checkbox" name="skip_if_logged" checked> <span data-i18n="r_skip"></span></label>
+          <p class="form-error" role="alert"></p>
+          <button class="btn primary" type="submit" data-i18n="r_add"></button>
+        </form>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="view-settings" class="view" hidden>
+        <header class="view-head"><h1 data-i18n="settings"></h1></header>
+
+        <form class="panel" id="profile-form">
+          <h2 data-i18n="profile"></h2>
+          <div class="grid2">
+            <label><span data-i18n="name"></span> <input id="p-name" name="display_name" maxlength="80" required></label>
+            <label><span data-i18n="language"></span> <select id="p-lang" name="preferred_language"><option value="en">English</option><option value="so">Soomaali</option><option value="es">Español</option></select></label>
+          </div>
+          <label><span data-i18n="timezone"></span> <input id="p-tz" name="timezone" list="tz-list" required></label>
+          <datalist id="tz-list"></datalist>
+          <p class="form-error" role="alert"></p>
+          <button class="btn" type="submit" data-i18n="save_profile"></button>
+        </form>
+
+        <form class="panel" id="targets-form">
+          <h2 data-i18n="goal"></h2>
+          <p class="note" data-i18n="goal_note"></p>
+          <div class="grid2">
+            <label><span data-i18n="calories"></span> <input id="t-kcal" name="calories_kcal" type="number" min="1" max="10000" step="1" required></label>
+            <label><span data-i18n="protein_g"></span> <input id="t-protein" name="protein_g" type="number" min="0" max="1000" step="1"></label>
+            <label><span data-i18n="carbs_g"></span> <input id="t-carbs" name="carbs_g" type="number" min="0" max="2000" step="1"></label>
+            <label><span data-i18n="fat_g"></span> <input id="t-fat" name="fat_g" type="number" min="0" max="1000" step="1"></label>
+            <label><span data-i18n="fiber_g"></span> <input id="t-fiber" name="fiber_g" type="number" min="0" max="300" step="1"></label>
+          </div>
+          <p class="form-error" role="alert"></p>
+          <button class="btn primary" type="submit" data-i18n="save_goal"></button>
+        </form>
+
+        <div class="panel" id="phone-panel">
+          <h2 data-i18n="phone_texts"></h2>
+          <div id="phone-status"></div>
+          <form id="phone-form" class="stack">
+            <label><span data-i18n="phone_number"></span> <input id="ph-number" name="phone" type="tel" autocomplete="tel" placeholder="+1 612 555 0100"></label>
+            <button class="btn" type="submit" data-i18n="send_code"></button>
+          </form>
+          <form id="code-form" class="stack" hidden>
+            <label><span data-i18n="code6"></span> <input id="ph-code" name="code" inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code"></label>
+            <label class="inline"><input id="ph-agree" type="checkbox" name="agree" checked> <span data-i18n="consent"></span></label>
+            <button class="btn primary" type="submit" data-i18n="confirm_number"></button>
+          </form>
+          <p class="form-error" role="alert"></p>
+        </div>
+        <p class="note small" data-i18n="footer"></p>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
