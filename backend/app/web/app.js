@@ -1,4 +1,5 @@
-/* Dream Health web app. Plain JavaScript, no build step. Talks to the same /v1 API as /docs.
+/* Dream Health web app. © 2026 Abdirisak Omar. All rights reserved.
+   Plain JavaScript, no build step. Talks to the same /v1 API as /docs.
    All screen text comes from i18n.js (English, Somali, Spanish). */
 (() => {
   "use strict";
@@ -7,7 +8,7 @@
   const TOKEN_KEY = "dh_token";
   const LANG_KEY = "dh_lang";
   const I18N = window.DH_I18N;
-  const state = { me: null, day: null, lastChatId: null, lastSmsId: null, poll: null, phone: null, lang: "en" };
+  const state = { me: null, day: null, lastChatId: null, lastSmsId: null, poll: null, phone: null, lang: "en", langPicked: false };
 
   // ---------- storage (private windows can refuse it, so every call is guarded) ----------
   const store = {
@@ -92,7 +93,8 @@
     formError($("#auth-form"), "");
   }
   $$(".seg button").forEach(b => b.addEventListener("click", () => setAuthMode(b.dataset.auth)));
-  $$(".lang-pick button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+  // A language picked on the login page wins over the one saved on the account (and gets saved to it).
+  $$(".lang-pick button").forEach(b => b.addEventListener("click", () => { state.langPicked = true; setLang(b.dataset.lang); }));
 
   $("#auth-form").addEventListener("submit", async e => {
     e.preventDefault();
@@ -151,12 +153,15 @@
     cap.replaceChildren();
     if (k.target !== null) {
       const left = Number(k.remaining), target = Number(k.target);
-      fill.style.strokeDasharray = `${Math.max(0, Math.min(100, Number(k.eaten) / target * 100))} 100`;
+      const pct = Math.max(0, Math.min(100, Number(k.eaten) / target * 100));
+      fill.style.strokeDasharray = `${pct} 101`;
+      fill.style.opacity = pct > 0 ? "1" : "0";  // round ends would draw dots at 0
       if (left < 0) fill.classList.add("is-over"); else if (left < target * 0.15) fill.classList.add("is-low");
       $("#kcal-left").textContent = n0(Math.abs(left));
       cap.textContent = left < 0 ? tr("kcal_over", { goal: n0(target) }) : tr("kcal_left_of", { goal: n0(target) });
     } else {
-      fill.style.strokeDasharray = "0 100";
+      fill.style.strokeDasharray = "0 101";
+      fill.style.opacity = "0";
       $("#kcal-left").textContent = n0(sum.totals.kcal);
       const a = document.createElement("a"); a.href = "#settings"; a.textContent = tr("set_goal");
       cap.append(tr("kcal_eaten") + " ", a);
@@ -484,6 +489,11 @@
   async function boot() {
     if (!store.get(TOKEN_KEY)) { $("#auth").hidden = false; return; }
     try { state.me = await api("/v1/me"); } catch { return; }
+    const accountLang = state.me.preferred_language.split("-")[0];
+    if (state.langPicked && state.lang !== accountLang) {
+      try { state.me = await api("/v1/me", { method: "PATCH", body: { preferred_language: state.lang } }); } catch { /* keep going */ }
+    }
+    state.langPicked = false;
     setLang(state.me.preferred_language.split("-")[0]);
     $("#auth").hidden = true; $("#shell").hidden = false;
     state.day = null; state.lastChatId = null; state.lastSmsId = null;

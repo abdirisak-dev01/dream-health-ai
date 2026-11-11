@@ -1,5 +1,7 @@
 # Dream Health AI (test version 0.4)
 
+By **Abdirisak Omar** · © 2026 Abdirisak Omar. All rights reserved. See [LICENSE](LICENSE).
+
 A helper where people text what they ate and see how much "fuel" is left for the day.
 
 > Test version for a personal pilot. Not medical advice.
@@ -18,7 +20,7 @@ A helper where people text what they ate and see how much "fuel" is left for the
 
 **Languages:** English, Soomaali and Español. Pick one on the login page or in Settings → Profile.
 Screens, chat replies, texts and reminders all follow that choice.
-Somali and Spanish were written by Claude and need a native speaker's check before launch
+Somali and Spanish translations need a native speaker's check before launch
 (screen text: `backend/app/web/i18n.js`, replies: `backend/app/i18n.py`).
 
 Words the app understands in chat and texts:
@@ -106,3 +108,7 @@ backend/alembic/   database updates
 backend/tests/
 docs/
 ```
+
+## Copyright
+
+© 2026 Abdirisak Omar. All rights reserved. Contact: Abdirisak8427@gmail.com

@@ -1,5 +1,6 @@
 /* Screen text in English, Somali and Spanish.
-   Somali and Spanish were written by Claude: a native speaker must check them before launch.
+   Somali and Spanish translations must be checked by a native speaker before launch.
+   © 2026 Abdirisak Omar. All rights reserved.
    Use: tr("key", {name: "x"}) */
 window.DH_I18N = {
   en: {

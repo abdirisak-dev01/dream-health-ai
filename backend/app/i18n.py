@@ -4,7 +4,7 @@ Rules for writers:
   * Short, friendly, plain words. One idea per line.
   * Text messages cost more with some accents (UCS-2), so sms_safe() swaps a/e/i/o/u accents that the
     standard GSM text alphabet lacks. n-tilde, e-acute and the Spanish question/exclamation marks are fine.
-  * Somali and Spanish were written by Claude and MUST be checked by a native speaker before launch.
+  * Somali and Spanish translations MUST be checked by a native speaker before launch.
 
 Use: t(lang, "key", name="Abdirisak")
 """

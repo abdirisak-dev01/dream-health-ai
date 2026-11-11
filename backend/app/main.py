@@ -1,4 +1,4 @@
-"""Dream Health AI - backend (modular monolith)."""
+"""Dream Health AI - backend (modular monolith). © 2026 Abdirisak Omar. All rights reserved."""
 import asyncio
 import json
 import logging
@@ -59,7 +59,8 @@ def create_app() -> FastAPI:
         version=API_VERSION,
         description="Login, targets, food lookup, meal logging with confirmation, daily totals, chat, "
                     "text messages (test mode), reminders and audit history. "
-                    "Planning-stage software: not medical advice. The web app is at /app/",
+                    "Planning-stage software: not medical advice. The web app is at /app/ "
+                    "© 2026 Abdirisak Omar. All rights reserved.",
         lifespan=lifespan,
     )
     install_error_handlers(app)
