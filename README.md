@@ -4,6 +4,8 @@ By **Abdirisak Omar** · © 2026 Abdirisak Omar. All rights reserved. See [LICEN
 
 A helper where people text what they ate and see how much "fuel" is left for the day.
 
+▶️ **Demo video:** https://youtu.be/Mpf_ZdUS4s0
+
 > Test version for a personal pilot. Not medical advice.
 > Food numbers are **development placeholders** and must be replaced with reviewed data before real users.
 
