@@ -36,9 +36,15 @@ UNIT_ALIASES = {
     "cucharaditas": "tsp", "rebanada": "slice", "rebanadas": "slice", "pieza": "piece", "piezas": "piece",
     "grande": "large", "grandes": "large", "mediano": "medium", "mediana": "medium", "pequeño": "small",
     "pequeno": "small", "pequeña": "small",
-    # Somali
-    "garaam": "g", "garaamka": "g", "kiilo": "kg", "koob": "cup", "koobab": "cup", "jeex": "slice",
-    "xabbo": "piece", "weyn": "large",
+    # French
+    "gramme": "g", "grammes": "g", "gr.": "g", "kilos": "kg", "tasse": "cup", "tasses": "cup", "tranche": "slice",
+    "tranches": "slice", "morceau": "piece", "morceaux": "piece", "gros": "large", "grosse": "large",
+    "moyen": "medium", "moyenne": "medium", "petit": "small", "petite": "small", "once": "oz", "onces": "oz",
+    "livre": "lb", "livres": "lb",
+    # Arabic
+    "غ": "g", "غرام": "g", "غرامات": "g", "جرام": "g", "جم": "g", "كغ": "kg", "كيلو": "kg", "كيلوغرام": "kg",
+    "كوب": "cup", "أكواب": "cup", "اكواب": "cup", "شريحة": "slice", "شرائح": "slice", "قطعة": "piece", "قطع": "piece",
+    "أونصة": "oz", "اونصة": "oz", "رطل": "lb",
 }
 
 # Words that are units only when a food defines them as a portion

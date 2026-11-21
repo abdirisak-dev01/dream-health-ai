@@ -9,7 +9,7 @@ Phase 1 core
 
 Added in 0.2
 - Web app at `/` (Today gauge, Chat, Texts, Reminders, Settings), phone-first, light + dark mode
-- One conversation brain for chat and texts: meal → draft, YES/NO, TODAY, UNDO, HELP; Somali shortcuts (HAA, MAYA, MAANTA)
+- One conversation brain for chat and texts: meal → draft, YES/NO, TODAY, UNDO, HELP; shortcut words in every app language
 - Text replies are plain ASCII (non-ASCII texts cost 2-3x per message)
 - Phone number + 6-digit code (hashed, 10-minute expiry, 5 tries) + explicit consent to texts
 - STOP / CANCEL / UNSUBSCRIBE turn texts off with one confirmation, START turns them back on
@@ -18,13 +18,19 @@ Added in 0.2
   in-app + browser pop-up + text; background checker every 30 s; safe if two API containers run (SKIP LOCKED)
 - Migration 0002 tested on a database that already has users
 
+Added in 0.5
+- Languages are now English, Spanish, French, Arabic and Mandarin (Somali removed; migration 0004 moves Somali accounts to English)
+- Arabic: right-to-left screens, Arabic-Indic digits (١٥٠) understood, Arabic letters kept in texts (Unicode SMS)
+- Mandarin: meals understood without spaces (150克烤鸡胸肉和1杯米饭, 两个鸡蛋); a bowl (碗) has no fixed size, so the app asks for grams
+- Food names in all 5 languages; 104 automated tests
+
 ## Needed before launch (owner in brackets)
 1. Incoming-text webhook for the real provider (with signature check) so replies from real phones reach the app. [Backend]
 2. WhatsApp channel (main channel for users outside the US/Canada, where SMS costs 5-37 cents per text). [Backend + Product]
 3. Check per-country prices for the launch countries; set a monthly spending cap at the provider. [Product/Finance]
 4. US texting registration (toll-free verification or 10DLC). [Product/Legal]
 5. Replace dev food values with a reviewed USDA FoodData Central import. [Nutrition]
-6. Native-speaker check of Somali/Spanish words and replies; reply translations. [Localization]
+6. Native-speaker check of Spanish, French, Arabic and Mandarin words, replies and screens. [Localization]
 7. Account deletion + data export; logout/token revocation; password reset. [Security/Privacy]
 8. Login limiter on shared storage if more than one API container runs; backups + restore drill. [DevOps/SRE]
 

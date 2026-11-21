@@ -14,13 +14,13 @@ def test_health(client):
 
 
 def test_register_login_me(client, make_user):
-    u = make_user(tz="Africa/Mogadishu", lang="so")
+    u = make_user(tz="Africa/Cairo", lang="ar")
     r = client.get("/v1/me", headers=u["headers"])
     assert r.status_code == 200
     body = r.json()
     assert body["email"] == u["email"]
-    assert body["timezone"] == "Africa/Mogadishu"
-    assert body["preferred_language"] == "so"
+    assert body["timezone"] == "Africa/Cairo"
+    assert body["preferred_language"] == "ar"
     assert "password_hash" not in body
 
 

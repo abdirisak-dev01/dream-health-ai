@@ -1,18 +1,20 @@
 """The conversation engine: one brain for the in-app chat and for text messages.
+© 2026 Abdirisak Omar. All rights reserved.
 
-What a user can send (English / Somali / Spanish):
+What a user can send (English / Spanish / French / Arabic / Mandarin):
     "lunch: 1 cup rice, 2 eggs"     -> a meal DRAFT with calories, nothing saved yet
-    YES  / HAA   / SI               -> save the latest draft
-    NO   / MAYA  / NO               -> throw the draft away
-    TODAY/ MAANTA/ HOY              -> today's totals vs goal
-    UNDO / TIRTIR/ DESHACER         -> remove the last saved meal from today
-    HELP / CAAWI / AYUDA            -> how to use it
+    YES / SÍ / OUI / نعم / 是        -> save the latest draft
+    NO / NO / NON / لا / 不          -> throw the draft away
+    TODAY / HOY / AUJOURD'HUI / اليوم / 今天   -> today's totals vs goal
+    UNDO / DESHACER / EFFACER / تراجع / 撤销   -> remove the last saved meal from today
+    HELP / AYUDA / AIDE / مساعدة / 帮助        -> how to use it
     STOP / START                    -> (text messages only) turn texts off / on. Carriers require English words.
 
 Replies come from app/i18n.py in the user's language.
 Rule-based, no AI: unclear foods are flagged and the user is asked, never guessed.
 """
 import re
+import unicodedata
 from datetime import datetime, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
@@ -28,30 +30,45 @@ from app.meals import service as meals
 from app.meals.models import MealProposal
 from app.meals.nutrition import sum_items
 from app.meals.schemas import ProposalIn
-from app.meals.text_parser import has_any_amount
+from app.meals.text_parser import has_any_amount, prepare
 from app.targets.models import NutritionTarget
 from app.users.models import User
 
-YES = {"yes", "y", "ok", "okay", "save", "confirm", "haa", "ha", "haye", "si", "sí", "vale", "guardar"}
-NO = {"no", "n", "nope", "discard", "maya", "may", "cancelar"}
-TODAY = {"today", "total", "totals", "summary", "maanta", "hoy", "resumen"}
-HELP = {"help", "?", "commands", "caawi", "caawimaad", "ayuda"}
-UNDO = {"undo", "tirtir", "deshacer", "borrar"}
+YES = {"yes", "y", "ok", "okay", "save", "confirm", "si", "sí", "vale", "guardar", "oui", "ouais", "d'accord",
+       "نعم", "أجل", "اجل", "ايوه", "موافق", "是", "好", "好的", "确认", "保存", "对"}
+NO = {"no", "n", "nope", "discard", "cancelar", "non", "لا", "不", "否", "不要", "取消"}
+TODAY = {"today", "total", "totals", "summary", "hoy", "resumen", "aujourd'hui", "bilan", "اليوم", "المجموع",
+         "今天", "总计"}
+HELP = {"help", "?", "commands", "ayuda", "aide", "مساعدة", "帮助", "帮忙"}
+UNDO = {"undo", "deshacer", "borrar", "effacer", "تراجع", "حذف", "撤销", "删除"}
 GREETINGS = {
     "hi", "hello", "hey", "how", "how are you", "good morning", "good evening", "thanks", "thank you", "ok thanks",
-    "salaam", "salam", "asc", "salaan", "assalamu alaikum", "iska warran", "nabad", "mahadsanid", "subax wanaagsan",
     "hola", "buenos dias", "buenos días", "buenas", "buenas tardes", "buenas noches", "gracias", "que tal", "qué tal",
+    "bonjour", "salut", "bonsoir", "coucou", "merci", "ça va", "ca va",
+    "مرحبا", "اهلا", "أهلا", "السلام عليكم", "صباح الخير", "مساء الخير", "شكرا",
+    "你好", "您好", "嗨", "哈喽", "谢谢", "早上好", "晚上好",
 }
 # Standard US carrier opt-out words. On SMS, CANCEL means STOP (industry rule), not "cancel draft".
-STOP = {"stop", "stopall", "unsubscribe", "cancel", "end", "quit", "jooji", "parar", "alto"}
-START = {"start", "unstop", "subscribe", "bilow", "iniciar"}
+# TD is the usual Chinese "unsubscribe" reply.
+STOP = {"stop", "stopall", "unsubscribe", "cancel", "end", "quit", "parar", "alto", "arret", "arrêt",
+        "ايقاف", "إيقاف", "توقف", "td", "退订", "停止"}
+START = {"start", "unstop", "subscribe", "iniciar", "commencer", "ابدأ", "ابدا", "开始"}
 
 DRAFT_MAX_AGE = timedelta(hours=3)
-_MEALS_RE = r"breakfast|lunch|dinner|supper|snack|quraac|qado|casho|desayuno|almuerzo|cena|merienda"
-_MEAL_PREFIX = re.compile(rf"^\s*({_MEALS_RE})\s*[:\-]\s*", re.IGNORECASE)
-_MEAL_WORD = re.compile(rf"\b({_MEALS_RE})\b", re.IGNORECASE)
-_MEAL_WORDS = {"supper": "dinner", "quraac": "breakfast", "qado": "lunch", "casho": "dinner",
-               "desayuno": "breakfast", "almuerzo": "lunch", "cena": "dinner", "merienda": "snack"}
+_MEALS_RE = (r"petit[- ]d[ée]jeuner|breakfast|lunch|dinner|supper|snack|desayuno|almuerzo|cena|merienda|"
+             r"d[ée]jeuner|d[îi]ner|souper|collation|go[ûu]ter|الفطور|فطور|الإفطار|افطار|الغداء|غداء|العشاء|عشاء")
+_MEAL_PREFIX = re.compile(rf"^\s*({_MEALS_RE}|早餐|早饭|午餐|午饭|晚餐|晚饭|加餐)\s*[:\-]\s*", re.IGNORECASE)
+_MEAL_WORD = re.compile(rf"(?<![\w-])({_MEALS_RE})(?![\w-])|(早餐|早饭|午餐|午饭|晚餐|晚饭|加餐|零食)", re.IGNORECASE)
+_MEAL_WORDS = {
+    "supper": "dinner", "desayuno": "breakfast", "almuerzo": "lunch", "cena": "dinner", "merienda": "snack",
+    "petit-déjeuner": "breakfast", "petit-dejeuner": "breakfast", "petit déjeuner": "breakfast",
+    "petit dejeuner": "breakfast", "déjeuner": "lunch", "dejeuner": "lunch", "dîner": "dinner", "diner": "dinner",
+    "souper": "dinner", "collation": "snack", "goûter": "snack", "gouter": "snack",
+    "الفطور": "breakfast", "فطور": "breakfast", "الإفطار": "breakfast", "افطار": "breakfast", "الغداء": "lunch",
+    "غداء": "lunch", "العشاء": "dinner", "عشاء": "dinner",
+    "早餐": "breakfast", "早饭": "breakfast", "午餐": "lunch", "午饭": "lunch", "晚餐": "dinner", "晚饭": "dinner",
+    "加餐": "snack", "零食": "snack",
+}
 
 
 def _n(x) -> str:
@@ -140,8 +157,11 @@ def today_text(db: Session, user: User) -> str:
 def handle(db: Session, user: User, text: str, channel: str) -> str:
     """Return the reply text. Caller records messages and commits."""
     lang = lang_of(user)
-    raw = (text or "").strip()
-    word = re.sub(r"\s+", " ", raw.lower()).strip(" .!¡?¿,")
+    raw = prepare(text or "").strip()
+    # The whole message as one "word": lower-case, no accents marks on Arabic, no end punctuation
+    word = "".join(ch for ch in unicodedata.normalize("NFKD", raw) if not unicodedata.combining(ch)) \
+        if re.search(r"[\u0600-\u06FF]", raw) else raw
+    word = re.sub(r"\s+", " ", word.lower()).strip(" .!¡?¿,؟!")
 
     if not word or word in HELP or raw.strip() == "?":
         return t(lang, "help")
@@ -197,9 +217,9 @@ def handle(db: Session, user: User, text: str, channel: str) -> str:
         meal_type = _MEAL_WORDS.get(w, w)
         raw = raw[m.end():]
     if meal_type is None:
-        found = _MEAL_WORD.search(raw)  # "for lunch I had ...", "en el almuerzo comí ..."
+        found = _MEAL_WORD.search(raw)  # "for lunch I had ...", "pour le déjeuner j'ai mangé ...", "午餐吃了..."
         if found:
-            w = found.group(1).lower()
+            w = (found.group(1) or found.group(2)).lower()
             meal_type = _MEAL_WORDS.get(w, w)
     if meal_type is None:
         meal_type = _meal_type_for(utcnow().astimezone(ZoneInfo(user.timezone)))

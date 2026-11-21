@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 # Languages planned for early pilots. Adding one is a product + localization decision, not a code tweak.
-SUPPORTED_LANGUAGES = {"en", "es", "so"}
+SUPPORTED_LANGUAGES = {"en", "es", "fr", "ar", "zh"}
 _LANG_RE = re.compile(r"^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$")
 
 

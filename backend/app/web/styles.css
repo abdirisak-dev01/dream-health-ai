@@ -197,3 +197,27 @@ label.inline input, .checks input, .days input { width: 20px; min-height: 20px; 
 .lang-pick button[aria-pressed="true"] { border-color: var(--pine); color: var(--pine); background: color-mix(in srgb, var(--pine) 10%, var(--surface)); }
 .meal-top h3 { text-transform: none; }
 .rem-title { text-transform: none; }
+
+/* ---------- Arabic and Chinese ---------- */
+/* Arabic and Chinese letters use fonts made for them; Latin text keeps the normal fonts. */
+:root:lang(ar) { --display: "Noto Sans Arabic", "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+                 --body: "Noto Sans Arabic", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; }
+:root:lang(zh-Hans) { --display: "Bricolage Grotesque", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+                      --body: "Atkinson Hyperlegible", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif; }
+:root:lang(ar) h1, :root:lang(ar) h2, :root:lang(zh-Hans) h1, :root:lang(zh-Hans) h2 { letter-spacing: 0; }
+:root:lang(ar) body { line-height: 1.7; }
+button[lang="ar"] { font-family: "Noto Sans Arabic", sans-serif; }
+button[lang="zh-Hans"] { font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif; }
+
+/* Arabic reads right to left: mirror the side menu, bubbles and borders. */
+[dir="rtl"] .bubble.out { border-bottom-left-radius: 18px; border-bottom-right-radius: 6px; }
+[dir="rtl"] .bubble.in { border-bottom-right-radius: 18px; border-bottom-left-radius: 6px; }
+[dir="rtl"] .test-banner { border-left: 0; border-right: 4px solid var(--saffron); }
+/* phone numbers, codes, times and emails stay left to right */
+[dir="rtl"] input[type="tel"], [dir="rtl"] input[type="email"], [dir="rtl"] input[inputmode="numeric"], [dir="rtl"] input[type="time"] { direction: ltr; text-align: right; }
+@media (min-width: 900px) {
+  [dir="rtl"] .rail { inset: 0 0 0 auto; border-right: 0; border-left: 1.5px solid var(--line); }
+  [dir="rtl"] .rail-logout { text-align: right; }
+  [dir="rtl"] .content { margin-left: auto; margin-right: 220px; }
+  [dir="rtl"] .toast { left: calc(50% - 110px); }
+}

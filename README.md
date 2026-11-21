@@ -1,4 +1,4 @@
-# Dream Health AI (test version 0.4)
+# Dream Health AI (test version 0.5)
 
 By **Abdirisak Omar** · © 2026 Abdirisak Omar. All rights reserved. See [LICENSE](LICENSE).
 
@@ -18,9 +18,10 @@ A helper where people text what they ate and see how much "fuel" is left for the
 | **Phone + consent** | Add a number, confirm with a 6-digit code, agree to texts. `STOP` turns texts off, `START` turns them back on |
 | **API remote control** | http://localhost:8000/docs |
 
-**Languages:** English, Soomaali and Español. Pick one on the login page or in Settings → Profile.
-Screens, chat replies, texts and reminders all follow that choice.
-Somali and Spanish translations need a native speaker's check before launch
+**Languages:** English, Español, Français, العربية (Arabic) and 中文 (Mandarin, Simplified Chinese).
+Pick one on the login page or in Settings → Profile. Screens, chat replies, texts and reminders all follow that choice.
+Arabic screens read right to left. Arabic and Chinese texts are sent as Unicode SMS (70 characters per part instead of 160,
+so they cost more per message). Spanish, French, Arabic and Chinese translations need a native speaker's check before launch
 (screen text: `backend/app/web/i18n.js`, replies: `backend/app/i18n.py`).
 
 Words the app understands in chat and texts:
@@ -29,13 +30,15 @@ Words the app understands in chat and texts:
 |---|---|
 | `lunch: 1 cup rice, 150 g roasted chicken` | Makes a draft (nothing saved yet) |
 | `i ate 150g of roasted chicken 200g of rice` | Also works: everyday sentences, no commas needed. Typos get a "did you mean" |
-| `YES` / `HAA` / `SÍ` | Saves the draft |
-| `NO` / `MAYA` | Throws the draft away (in chat) |
-| `TODAY` / `MAANTA` / `HOY` | Today's totals and what's left |
-| `UNDO` / `TIRTIR` / `DESHACER` | Removes the last saved meal today |
-| `HELP` / `CAAWI` / `AYUDA` | How to use it |
-| `waxaan cunay 1 koob bariis iyo 2 ukun` | Somali meal |
+| `YES` / `SÍ` / `OUI` / `نعم` / `是` | Saves the draft |
+| `NO` / `NON` / `لا` / `不` | Throws the draft away (in chat) |
+| `TODAY` / `HOY` / `AUJOURD'HUI` / `اليوم` / `今天` | Today's totals and what's left |
+| `UNDO` / `DESHACER` / `EFFACER` / `تراجع` / `撤销` | Removes the last saved meal today |
+| `HELP` / `AYUDA` / `AIDE` / `مساعدة` / `帮助` | How to use it |
 | `comí 1 taza de arroz y 2 huevos` | Spanish meal |
+| `j'ai mangé 150 g de poulet rôti et 1 tasse de riz` | French meal |
+| `أكلت 150 غ دجاج مشوي و كوب أرز` | Arabic meal (Arabic digits like ١٥٠ work too) |
+| `午餐：150克烤鸡胸肉和1杯米饭` | Mandarin meal (no spaces needed; 两个鸡蛋 works too) |
 | `STOP` / `CANCEL` (texts) | Turns texts off. Required by phone carriers |
 | `START` (texts) | Turns texts back on |
 

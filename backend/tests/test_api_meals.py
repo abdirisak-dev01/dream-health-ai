@@ -11,7 +11,7 @@ def test_food_search(client, make_user):
     assert len(names) == 2  # raw and roasted: the user must pick
     names = [f["name"] for f in client.get("/v1/foods", params={"q": "oil"}, headers=h).json()]
     assert names == ["Oil, olive"]  # whole-word match: no "boiled" lentils
-    assert client.get("/v1/foods", params={"q": "bariis"}, headers=h).json()[0]["name"].startswith("Rice")
+    assert client.get("/v1/foods", params={"q": "arroz"}, headers=h).json()[0]["name"].startswith("Rice")
     assert client.get("/v1/foods", params={"q": "chicken"}).status_code == 401
 
 

@@ -25,7 +25,7 @@ from app.reminders.router import router as reminders_router
 from app.targets.router import router as targets_router
 from app.users.router import auth_router, me_router
 
-API_VERSION = "0.4.0"
+API_VERSION = "0.5.0"
 log = logging.getLogger("dhai")
 WEB_DIR = Path(__file__).parent / "web"
 

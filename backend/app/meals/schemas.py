@@ -42,7 +42,7 @@ class ItemOut(BaseModel):
 
     food_id: uuid.UUID
     food_name: str
-    food_labels: dict | None = None  # {"en": "Rice (cooked)", "so": "Bariis (la karsaday)", "es": "Arroz blanco (cocido)"}
+    food_labels: dict | None = None  # {"en": "Rice (cooked)", "es": "Arroz blanco (cocido)"}
     quantity: Decimal
     unit: str
     grams: Decimal

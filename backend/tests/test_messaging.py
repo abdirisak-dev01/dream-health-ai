@@ -55,7 +55,7 @@ def test_chat_no_cancels_and_new_meal_replaces_draft(client, make_user):
     assert chat(client, h, "yes").startswith("Saved!")
     meals = client.get("/v1/meals", headers=h).json()
     assert [i["food_name"] for i in meals[0]["items"]] == ["Egg, whole, raw"]
-    assert meals[0]["items"][0]["food_labels"] == {"en": "Egg", "so": "Ukun", "es": "Huevo"}
+    assert meals[0]["items"][0]["food_labels"] == {"en": "Egg", "es": "Huevo", "fr": "Œuf", "ar": "بيضة", "zh": "鸡蛋"}
     chat(client, h, "1 banana")
     assert "Nothing was saved" in chat(client, h, "no")
     assert "nothing to save" in chat(client, h, "yes")
@@ -138,7 +138,7 @@ def test_text_a_meal_and_save_it(client, make_user):
     assert client.get("/v1/days/today/summary", headers=h).json()["meal_count"] == 1
 
 
-@pytest.mark.parametrize("lang", ["en", "so", "es"])
+@pytest.mark.parametrize("lang", ["en", "es", "fr"])
 def test_sms_replies_stay_in_cheap_text_alphabet(client, make_user, lang):
     from app.i18n import is_gsm7
     h = make_user(lang=lang)["headers"]
@@ -211,21 +211,71 @@ def test_meal_word_in_sentence_sets_meal_type(client, make_user):
     assert chat(client, h, "for breakfast I had 1 cup oats").startswith("Here's your breakfast:")
 
 
-# ---- Somali and Spanish ----------------------------------------------------------------------
+# ---- Spanish, French, Arabic, Mandarin --------------------------------------------------------------
 
-def test_somali_conversation(client, make_user):
-    h = make_user(lang="so")["headers"]
+def test_french_conversation(client, make_user):
+    h = make_user(lang="fr")["headers"]
     client.put("/v1/me/targets", headers=h, json={"calories_kcal": 2000})
-    assert chat(client, h, "salaan").startswith("Salaan Test!")
-    reply = chat(client, h, "qado: waxaan cunay 1 koob bariis iyo 2 ukun")
-    assert "Bariis (la karsaday), 1 koob: 205 kcal" in reply
-    assert "Ukun, 2 weyn: 143 kcal" in reply
-    assert "HAA ama MAYA" in reply
-    reply = chat(client, h, "haa")
-    assert reply.startswith("Waa la kaydiyay! Qado: 348 kcal.") and "1652 kcal ayaa haray" in reply
-    assert chat(client, h, "maanta").startswith("Maanta: 1 cunto, 348 kcal")
-    reply = chat(client, h, "150 g digaag")
-    assert "midkee?" in reply and "Naas digaag (la dubay)" in reply
+    assert chat(client, h, "bonjour").startswith("Bonjour Test !")
+    reply = chat(client, h, "déjeuner : j'ai mangé 150 g de poulet rôti et 1 tasse de riz")
+    assert reply.startswith("Ton repas (déjeuner) :")
+    assert "Blanc de poulet (rôti), 150 g : 248 kcal" in reply
+    assert "Riz blanc (cuit), 1 tasse : 205 kcal" in reply
+    assert "Réponds OUI ou NON" in reply
+    reply = chat(client, h, "oui")
+    assert reply.startswith("Enregistré ! Déjeuner : 453 kcal.") and "il te reste 1547 kcal" in reply
+    assert chat(client, h, "aujourd'hui").startswith("Aujourd'hui : 1 repas, 453 kcal")
+    reply = chat(client, h, "2 tranches de pain avec 1 c. à soupe d'huile d'olive")
+    assert "Pain complet, 2 tranches : 161 kcal" in reply and "Huile d'olive, 1 c. à soupe : 119 kcal" in reply
+    assert "lequel ?" in chat(client, h, "150 g de poulet")
+
+
+def test_arabic_conversation(client, make_user):
+    h = make_user(lang="ar")["headers"]
+    client.put("/v1/me/targets", headers=h, json={"calories_kcal": 2000})
+    assert chat(client, h, "مرحبا").startswith("مرحبًا Test!")
+    reply = chat(client, h, "الغداء: أكلت 150 غ دجاج مشوي و كوب أرز")
+    assert reply.startswith("وجبتك (غداء):")
+    assert "صدر دجاج (مشوي)، 150 غ: 248 سعرة" in reply
+    assert "أرز أبيض (مطبوخ)، 1 كوب: 205 سعرة" in reply
+    reply = chat(client, h, "نعم")
+    assert reply.startswith("تم الحفظ! غداء: 453 سعرة.") and "تبقّى 1547 سعرة" in reply
+    assert chat(client, h, "اليوم").startswith("اليوم: 1 وجبة، 453 سعرة")
+    reply = chat(client, h, "٢ بيض، ١ كوب حليب")  # Arabic-Indic digits
+    assert "بيضة، 2 حبات كبيرة: 143 سعرة" in reply and "حليب كامل الدسم، 1 كوب: 149 سعرة" in reply
+    assert "أيّهما؟" in chat(client, h, "150 غ دجاج")
+
+
+def test_mandarin_conversation(client, make_user):
+    h = make_user(lang="zh")["headers"]
+    client.put("/v1/me/targets", headers=h, json={"calories_kcal": 2000})
+    assert chat(client, h, "你好").startswith("你好，Test！")
+    reply = chat(client, h, "午餐：我吃了150克烤鸡胸肉和1杯米饭")
+    assert reply.startswith("你的午餐：")
+    assert "烤鸡胸肉，150 克：248 千卡" in reply
+    assert "米饭，1 杯：205 千卡" in reply
+    reply = chat(client, h, "是")
+    assert reply.startswith("已保存！午餐：453 千卡。") and "还剩 1547 千卡" in reply
+    assert chat(client, h, "今天").startswith("今天：1 餐，453 千卡")
+    reply = chat(client, h, "两个鸡蛋")
+    assert "鸡蛋，2 个：143 千卡" in reply
+    assert "哪一种？" in chat(client, h, "150克鸡胸肉")
+    assert "我需要你帮个忙" in chat(client, h, "一碗米饭")  # a bowl has no fixed size: ask for grams
+
+
+@pytest.mark.parametrize("lang,word", [("ar", "مساعدة"), ("zh", "帮助")])
+def test_arabic_and_chinese_texts_keep_every_character(client, make_user, lang, word):
+    from app.i18n import needs_unicode_sms
+    h = make_user(lang=lang)["headers"]
+    verify_phone(client, h)
+    body = text(client, h, word)[0]["body"]
+    assert needs_unicode_sms(body) and len(body) > 40  # sent as a Unicode text, nothing stripped
+
+
+def test_somali_is_no_longer_offered(client):
+    r = client.post("/v1/auth/register", json={"email": "so@example.com", "password": "a-long-test-password",
+                                               "display_name": "x", "preferred_language": "so"})
+    assert r.status_code == 422
 
 
 def test_spanish_conversation(client, make_user):
@@ -250,6 +300,6 @@ def test_spanish_sms_drops_costly_accents(client, make_user):
 
 
 def test_reminder_in_users_language(client, make_user):
-    h = make_user(lang="so")["headers"]
+    h = make_user(lang="fr")["headers"]
     rem = client.post("/v1/reminders", headers=h, json={"label": "lunch", "at_time": "12:30"}).json()
-    assert rem["text"].startswith("Dream Health: waa waqtigii qadada")
+    assert rem["text"].startswith("Dream Health : c'est l'heure de noter le déjeuner")

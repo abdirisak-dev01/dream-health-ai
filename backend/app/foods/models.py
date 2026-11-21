@@ -19,7 +19,7 @@ class Food(Base):
     code: Mapped[str] = mapped_column(String(64), unique=True)  # stable ID from the data source/seed
     name: Mapped[str] = mapped_column(String(200))
     search_text: Mapped[str] = mapped_column(Text)  # normalized name + aliases, used for lookup
-    display_names: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # {"en": "Rice (cooked)", "so": ..., "es": ...}
+    display_names: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # {"en": "Rice (cooked)", "es": ..., "fr", "ar", "zh": ...}
     state: Mapped[str] = mapped_column(String(16))  # raw | cooked | prepared | n/a
 
     kcal_per_100g: Mapped[Decimal] = mapped_column(Numeric(7, 2))

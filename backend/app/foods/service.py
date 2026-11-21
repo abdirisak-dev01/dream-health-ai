@@ -15,11 +15,23 @@ SEED_SOURCE = "DEV_SEED_UNVERIFIED"
 SEED_VERSION = "dev-2026-11-06"
 
 
+_ARABIC_FOLD = str.maketrans({"ة": "ه", "ى": "ي", "ـ": ""})
+_CJK = re.compile(r"[\u3400-\u9FFF]")
+
+
 def normalize(text: str) -> str:
-    """lower-case, strip accents, keep letters/digits/apostrophes, single spaces."""
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii").lower()
-    text = re.sub(r"[^a-z0-9' ]+", " ", text)
+    """lower-case, strip accents and Arabic vowel marks, keep letters of any script, single spaces.
+    "Rôti" -> "roti", "أرز" -> "ارز", "１５０克" -> "150克"."""
+    text = unicodedata.normalize("NFKC", text or "")
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(ch for ch in text if not unicodedata.combining(ch)).lower().translate(_ARABIC_FOLD)
+    text = text.replace("’", "'")
+    text = re.sub(r"[^\w' ]+|_", " ", text)
     return re.sub(r"\s+", " ", text).strip()
+
+
+def has_cjk(text: str) -> bool:
+    return bool(_CJK.search(text or ""))
 
 
 def build_search_text(terms: list[str]) -> str:
@@ -33,6 +45,8 @@ def _terms(search_text: str) -> list[str]:
 
 def _token_variants(tok: str) -> list[str]:
     out = [tok]
+    if len(tok) > 3 and tok.startswith("ال"):  # Arabic "the": "الارز" -> "ارز"
+        out.append(tok[2:])
     if len(tok) > 3 and tok.endswith("es"):
         out.append(tok[:-2])
     if len(tok) > 2 and tok.endswith("s"):
@@ -46,6 +60,8 @@ def search_foods(db: Session, query: str, limit: int = 20) -> list[Food]:
     tokens = normalize(query).split()
     if not tokens:
         return []
+    if has_cjk(query):
+        return _search_cjk(db, "".join(tokens), limit)
     stmt = select(Food)
     for tok in tokens:
         variants = _token_variants(tok)
@@ -66,6 +82,24 @@ def search_foods(db: Session, query: str, limit: int = 20) -> list[Food]:
     return foods[:limit]
 
 
+def _search_cjk(db: Session, q: str, limit: int) -> list[Food]:
+    """Chinese has no spaces, so match names that appear inside the query ("烤鸡胸肉" contains "鸡胸肉").
+    The longest name wins: "烤鸡胸肉" picks roasted chicken; plain "鸡胸肉" matches raw and roasted, so it asks."""
+    scored = []
+    for f in db.scalars(select(Food)).all():
+        best = 0
+        for term in _terms(f.search_text):
+            t = term.replace(" ", "")
+            if has_cjk(t) and (t in q or q in t):
+                best = max(best, len(t) if t in q else len(q))
+        if best:
+            scored.append((best, f))
+    if not scored:
+        return []
+    top = max(b for b, _ in scored)
+    return [f for b, f in sorted(scored, key=lambda x: (-x[0], x[1].name)) if b == top][:limit]
+
+
 def exact_matches(db: Session, query: str) -> list[Food]:
     """Foods whose name or one alias equals the query exactly (after normalizing)."""
     q = normalize(query)
@@ -84,6 +118,9 @@ def _state_word(state: str) -> str:
 def suggest_foods(db: Session, query: str, limit: int = 6) -> list[Food]:
     """Typo help: 'chicj' -> foods with 'chicken'. Only used to ASK the user, never to save silently."""
     import difflib
+
+    if has_cjk(query):  # spelling distance doesn't work for Chinese characters
+        return []
 
     vocab = set()
     for text in db.scalars(select(Food.search_text)).all():
@@ -115,14 +152,17 @@ def _parse_portions(spec: str) -> list[tuple[str, Decimal, bool]]:
     return out
 
 
+LABEL_LANGS = ("en", "es", "fr", "ar", "zh")
+
+
 def _seed_terms(row: dict) -> str:
     aliases = [normalize(a) for a in row["aliases"].split("|") if a.strip()]
-    labels = [normalize(row[k]) for k in ("label_en", "label_so", "label_es") if row.get(k)]
+    labels = [normalize(row[f"label_{k}"]) for k in LABEL_LANGS if row.get(f"label_{k}")]
     return build_search_text([normalize(row["name"]) + _state_word(row["state"])] + aliases + labels)
 
 
 def _seed_labels(row: dict) -> dict:
-    return {lang: row[f"label_{lang}"] for lang in ("en", "so", "es") if row.get(f"label_{lang}")}
+    return {lang: row[f"label_{lang}"] for lang in LABEL_LANGS if row.get(f"label_{lang}")}
 
 
 def load_seed_foods(db: Session, path: Path = SEED_FILE) -> int:

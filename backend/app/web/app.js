@@ -1,6 +1,6 @@
 /* Dream Health web app. © 2026 Abdirisak Omar. All rights reserved.
    Plain JavaScript, no build step. Talks to the same /v1 API as /docs.
-   All screen text comes from i18n.js (English, Somali, Spanish). */
+   All screen text comes from i18n.js (English, Spanish, French, Arabic, Mandarin). */
 (() => {
   "use strict";
   const $ = (s, el = document) => el.querySelector(s);
@@ -27,7 +27,8 @@
   }
   function setLang(lang) {
     state.lang = I18N[lang] ? lang : "en";
-    document.documentElement.lang = state.lang;
+    document.documentElement.lang = state.lang === "zh" ? "zh-Hans" : state.lang;
+    document.documentElement.dir = state.lang === "ar" ? "rtl" : "ltr";  // Arabic reads right to left
     store.setLocal(LANG_KEY, state.lang);
     $$("[data-i18n]").forEach(el => { el.textContent = tr(el.dataset.i18n); });
     $$("[data-i18n-ph]").forEach(el => { el.placeholder = tr(el.dataset.i18nPh); });
@@ -72,7 +73,7 @@
     clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 2600);
   }
 
-  const numLocale = () => (state.lang === "so" ? "en" : state.lang);
+  const numLocale = () => ({ ar: "ar-u-nu-latn", zh: "zh-CN" })[state.lang] || state.lang;  // keep 0-9 digits, like the chat replies
   const n0 = v => Math.round(Number(v)).toLocaleString(numLocale());
   const n1 = v => { const x = Number(v); return x >= 100 ? n0(x) : (Math.round(x * 10) / 10).toString(); };
   const hhmm = iso => new Date(iso).toLocaleTimeString(numLocale(), { hour: "numeric", minute: "2-digit" });
